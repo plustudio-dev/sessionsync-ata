@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block title %}Session Sync - Visualizar Ata{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <h1>Visualizar Ata</h1>
+            <h4 class="text-muted">{{ session.title }}</h4>
+            <p>
+                <small class="text-muted">Gerada em: 
+                    {% if session.ata.generated_at %}
+                        {% if 'T' in session.ata.generated_at %}
+                            {{ session.ata.generated_at.split('T')[0] }}
+                        {% else %}
+                            {{ session.ata.generated_at }}
+                        {% endif %}
+                    {% endif %}
+                </small>
+            </p>
+            <div class="mb-3">
+                <a href="{{ url_for('ata_editor') }}" class="btn btn-secondary">Voltar</a>
+                <a href="{{ url_for('download_ata', session_id=session.session_id) }}" class="btn btn-success">
+                    <i class="bi bi-download"></i> Baixar Documento
+                </a>
+                <a href="{{ url_for('edit_ata', session_id=session.session_id) }}" class="btn btn-primary">
+                    <i class="bi bi-pencil"></i> Editar
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Conteúdo da Ata</h5>
+                </div>
+                <div class="card-body">
+                    <div class="ata-preview p-4">
+                        {{ ata_content|safe }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.ata-preview {
+    font-family: 'Times New Roman', Times, serif;
+    font-size: 14px;
+    line-height: 1.6;
+    white-space: pre-wrap;
+}
+</style>
+{% endblock %}

@@ -1,0 +1,1124 @@
+{% extends "base.html" %}
+
+{% block title %}Session Sync - Editar Ata{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row mb-4">
+        <div class="col-md-12">
+            {% if is_new %}
+            <h1>Criar Nova Ata</h1>
+            {% else %}
+            <h1>Editar Ata</h1>
+            {% endif %}
+            <h4 class="text-muted">{{ session.title }}</h4>
+            
+            <div class="mb-3">
+                <a href="{{ url_for('ata_editor') }}" class="btn btn-secondary">Voltar</a>
+                {% if not is_new %}
+                <a href="{{ url_for('download_ata', session_id=session.session_id) }}" class="btn btn-success">
+                    <i class="bi bi-download"></i> Baixar Documento
+                </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <form method="POST" action="{{ url_for('process_ata') }}">
+                <input type="hidden" name="session_id" value="{{ session.session_id }}">
+                
+                <div class="mb-3">
+                    <label for="tipo_sessao" class="form-label">Tipo de Sessão:</label>
+                    <select class="form-select" id="tipo_sessao" name="tipo_sessao" required>
+                        <option value="">Selecione o tipo</option>
+                        <option value="ordinaria" {% if tipo_sessao == 'ordinaria' %}selected{% endif %}>Ordinária</option>
+                        <option value="extraordinaria" {% if tipo_sessao == 'extraordinaria' %}selected{% endif %}>Extraordinária</option>
+                        <option value="solene" {% if tipo_sessao == 'solene' %}selected{% endif %}>Solene</option>
+                    </select>
+                </div>
+                
+                <!-- Campos ocultos para os metadados -->
+                <input type="hidden" id="numero_sessao" name="numero_sessao" value="{% if is_new %}{{ metadata.numero_sessao }}{% else %}{{ metadata.numero_sessao }}{% endif %}">
+                <input type="hidden" id="periodo" name="periodo" value="{% if is_new %}{{ metadata.periodo }}{% else %}{{ metadata.periodo }}{% endif %}">
+                <input type="hidden" id="numero_sessao_legislativa" name="numero_sessao_legislativa" value="{% if is_new %}{{ metadata.numero_sessao_legislativa }}{% else %}{{ metadata.numero_sessao_legislativa }}{% endif %}">
+                <input type="hidden" id="numero_legislatura" name="numero_legislatura" value="{% if is_new %}{{ metadata.numero_legislatura }}{% else %}{{ metadata.numero_legislatura }}{% endif %}">
+                <input type="hidden" id="cidade" name="cidade" value="{% if is_new %}{{ metadata.cidade }}{% else %}{{ metadata.cidade }}{% endif %}">
+                <input type="hidden" id="dia" name="dia" value="{% if is_new %}{{ metadata.dia }}{% else %}{{ metadata.dia }}{% endif %}">
+                <input type="hidden" id="mes" name="mes" value="{% if is_new %}{{ metadata.mes }}{% else %}{{ metadata.mes }}{% endif %}">
+                <input type="hidden" id="ano" name="ano" value="{% if is_new %}{{ metadata.ano }}{% else %}{{ metadata.ano }}{% endif %}">
+                <input type="hidden" id="hora" name="hora" value="{% if is_new %}{{ metadata.hora }}{% else %}{{ metadata.hora }}{% endif %}">
+                <input type="hidden" id="minutos" name="minutos" value="{% if is_new %}{{ metadata.minutos }}{% else %}{{ metadata.minutos }}{% endif %}">
+                <input type="hidden" id="presidente" name="presidente" value="{% if is_new %}{{ metadata.presidente }}{% else %}{{ metadata.presidente }}{% endif %}">
+                <input type="hidden" id="primeiro_secretario" name="primeiro_secretario" value="{% if is_new %}{{ metadata.primeiro_secretario }}{% else %}{{ metadata.primeiro_secretario }}{% endif %}">
+                <input type="hidden" id="segundo_secretario" name="segundo_secretario" value="{% if is_new %}{{ metadata.segundo_secretario }}{% else %}{{ metadata.segundo_secretario }}{% endif %}">
+                <input type="hidden" id="vereadores_presentes" name="vereadores_presentes" value="{% if is_new %}{{ metadata.vereadores_presentes }}{% else %}{{ metadata.vereadores_presentes }}{% endif %}">
+                <input type="hidden" id="numero_presentes" name="numero_presentes" value="{% if is_new %}{{ metadata.numero_presentes }}{% else %}{{ metadata.numero_presentes }}{% endif %}">
+                <input type="hidden" id="numero_presentes_extenso" name="numero_presentes_extenso" value="{% if is_new %}{{ metadata.numero_presentes_extenso }}{% else %}{{ metadata.numero_presentes_extenso }}{% endif %}">
+                <input type="hidden" id="dia_proxima_sessao" name="dia_proxima_sessao" value="{% if is_new %}{{ metadata.dia_proxima_sessao }}{% else %}{{ metadata.dia_proxima_sessao }}{% endif %}">
+                <input type="hidden" id="mes_proxima_sessao" name="mes_proxima_sessao" value="{% if is_new %}{{ metadata.mes_proxima_sessao }}{% else %}{{ metadata.mes_proxima_sessao }}{% endif %}">
+                {% if tipo_sessao == 'extraordinaria' %}
+                <input type="hidden" id="numero_artigo" name="numero_artigo" value="{% if is_new %}{{ metadata.numero_artigo }}{% else %}{{ metadata.numero_artigo }}{% endif %}">
+                {% endif %}
+                {% if tipo_sessao == 'solene' %}
+                <input type="hidden" id="motivo_sessao" name="motivo_sessao" value="{% if is_new %}{{ metadata.motivo_sessao }}{% else %}{{ metadata.motivo_sessao }}{% endif %}">
+                <input type="hidden" id="autoridades_presentes" name="autoridades_presentes" value="{% if is_new %}{{ metadata.autoridades_presentes }}{% else %}{{ metadata.autoridades_presentes }}{% endif %}">
+                {% endif %}
+                
+                <!-- Seção do Corpo da Ata por Partes -->
+                <div class="card mb-4">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">Edição por Seções da Ata</h5>
+                    </div>
+                    <div class="card-body">
+                        <!-- Cabeçalho da Ata -->
+                        <div class="mb-4">
+                            <h5 class="border-bottom pb-2">Cabeçalho</h5>
+                            
+                            <div class="mb-3">
+                                <label for="cabecalho_estrutura" class="form-label">Estrutura do Cabeçalho</label>
+                                <textarea class="form-control" id="cabecalho_estrutura" name="cabecalho_estrutura" rows="3">{% if is_new %}ATA DA {{ metadata.numero_sessao }}ª REUNIÃO {% if tipo_sessao == 'ordinaria' %}ORDINÁRIA{% elif tipo_sessao == 'extraordinaria' %}EXTRAORDINÁRIA{% elif tipo_sessao == 'solene' %}SOLENE{% endif %} DA {{ metadata.numero_sessao_legislativa }}ª SESSÃO LEGISLATIVA DA {{ metadata.numero_legislatura }}ª LEGISLATURA DA CÂMARA MUNICIPAL DE {{ metadata.cidade }}, REALIZADA NO DIA {{ metadata.dia }} DE {{ metadata.mes }} DE {{ metadata.ano }}.{% else %}{{ session.ata.sections.cabecalho.estrutura }}{% endif %}</textarea>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="cabecalho_presidencia" class="form-label">Presidência</label>
+                                <textarea class="form-control" id="cabecalho_presidencia" name="cabecalho_presidencia" rows="2">{% if is_new %}SOB A PRESIDÊNCIA DOS SENHORES VEREADORES: {{ metadata.presidente }}, PRESIDENTE; {{ metadata.primeiro_secretario }}, 1º SECRETÁRIO; {{ metadata.segundo_secretario }}, 2º SECRETÁRIO.{% else %}{{ session.ata.sections.cabecalho.presidencia }}{% endif %}</textarea>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="cabecalho_presenca" class="form-label">Presença</label>
+                                <textarea class="form-control" id="cabecalho_presenca" name="cabecalho_presenca" rows="3">{% if is_new %}ÀS {{ metadata.hora }}H{{ metadata.minutos }}, PRESENTES OS SENHORES VEREADORES: {{ metadata.vereadores_presentes }}. CONSULTADO O LIVRO DE PRESENÇA DOS SENHORES VEREADORES, QUE ACUSA O COMPARECIMENTO DE {{ metadata.numero_presentes }} ({{ metadata.numero_presentes_extenso }}) VEREADORES, FOI ABERTA À SESSÃO.{% else %}{{ session.ata.sections.cabecalho.presenca }}{% endif %}</textarea>
+                            </div>
+                        </div>
+                        
+                        <!-- Corpo da Ata -->
+                        <div class="mb-4">
+                            <h5 class="border-bottom pb-2">Corpo da Ata</h5>
+                            
+                            <div class="mb-3">
+                                <label for="corpo_abertura" class="form-label">Abertura</label>
+                                <textarea class="form-control" id="corpo_abertura" name="corpo_abertura" rows="3">{% if session.ata.sections.corpo.abertura %}{{ session.ata.sections.corpo.abertura|join('\n') }}{% else %}O SENHOR PRESIDENTE PROCEDE À CHAMADA NOMINAL DOS SENHORES VEREADORES PRESENTES. {{ metadata.vereadores_presentes }}
+O SENHOR PRESIDENTE CONVOCA O SENHOR 1º SECRETÁRIO A PROCEDER A LEITURA DO EXPEDIENTE:{% endif %}</textarea>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="corpo_expediente" class="form-label">Expediente</label>
+                                <div class="alert alert-info">
+                                    <small>
+                                        <strong>Marcadores de Início:</strong> 
+{% if tipo_sessao in marcadores and 'expediente' in marcadores[tipo_sessao] and 'inicio' in marcadores[tipo_sessao]['expediente'] %}
+    {% for marcador in marcadores[tipo_sessao]['expediente']['inicio'] %}
+        "{{ marcador }}"{% if not loop.last %}, {% endif %}
+    {% endfor %}
+{% else %}
+    <span class="text-danger">Marcadores não encontrados</span>
+{% endif %}
+                                        <br>
+                                        <strong>Marcadores de Fim:</strong> 
+{% if tipo_sessao in marcadores and 'expediente' in marcadores[tipo_sessao] and 'fim' in marcadores[tipo_sessao]['expediente'] %}
+    {% for marcador in marcadores[tipo_sessao]['expediente']['fim'] %}
+        "{{ marcador }}"{% if not loop.last %}, {% endif %}
+    {% endfor %}
+{% else %}
+    <span class="text-danger">Marcadores não encontrados</span>
+{% endif %}
+                                    </small>
+                                </div>
+                                <textarea class="form-control" id="corpo_expediente" name="corpo_expediente" rows="6">{{ session.ata.sections.corpo.expediente.conteudo }}</textarea>
+                                <button type="button" id="extrair_expediente" class="btn btn-sm btn-outline-secondary mt-2">Extrair da Transcrição</button>
+                                {% if tipo_sessao in marcadores and 'expediente' in marcadores[tipo_sessao] and 'inicio' in marcadores[tipo_sessao]['expediente'] %}
+<input type="hidden" id="marcadores_expediente_inicio" value='{{ marcadores[tipo_sessao]['expediente']['inicio']|tojson }}'>
+{% else %}
+<input type="hidden" id="marcadores_expediente_inicio" value='[]'>
+{% endif %}
+{% if tipo_sessao in marcadores and 'expediente' in marcadores[tipo_sessao] and 'fim' in marcadores[tipo_sessao]['expediente'] %}
+<input type="hidden" id="marcadores_expediente_fim" value='{{ marcadores[tipo_sessao]['expediente']['fim']|tojson }}'>
+{% else %}
+<input type="hidden" id="marcadores_expediente_fim" value='[]'>
+{% endif %}
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="corpo_pronunciamentos" class="form-label">Pronunciamentos</label>
+                                <div class="alert alert-info">
+                                    <small>
+                                        <strong>Marcadores de Início:</strong> 
+{% if tipo_sessao in marcadores and 'pronunciamentos' in marcadores[tipo_sessao] and 'inicio' in marcadores[tipo_sessao]['pronunciamentos'] %}
+    {% for marcador in marcadores[tipo_sessao]['pronunciamentos']['inicio'] %}
+        "{{ marcador }}"{% if not loop.last %}, {% endif %}
+    {% endfor %}
+{% else %}
+    <span class="text-danger">Marcadores não encontrados</span>
+{% endif %}
+                                        <br>
+                                        <strong>Marcadores de Fim:</strong> 
+{% if tipo_sessao in marcadores and 'pronunciamentos' in marcadores[tipo_sessao] and 'fim' in marcadores[tipo_sessao]['pronunciamentos'] %}
+    {% for marcador in marcadores[tipo_sessao]['pronunciamentos']['fim'] %}
+        "{{ marcador }}"{% if not loop.last %}, {% endif %}
+    {% endfor %}
+{% else %}
+    <span class="text-danger">Marcadores não encontrados</span>
+{% endif %}
+                                    </small>
+                                </div>
+                                <textarea class="form-control" id="corpo_pronunciamentos" name="corpo_pronunciamentos" rows="6">{{ session.ata.sections.corpo.pronunciamentos.conteudo }}</textarea>
+                                <button type="button" id="extrair_pronunciamentos" class="btn btn-sm btn-outline-secondary mt-2">Extrair da Transcrição</button>
+                                {% if tipo_sessao in marcadores and 'pronunciamentos' in marcadores[tipo_sessao] and 'inicio' in marcadores[tipo_sessao]['pronunciamentos'] %}
+<input type="hidden" id="marcadores_pronunciamentos_inicio" value='{{ marcadores[tipo_sessao]['pronunciamentos']['inicio']|tojson }}'>
+{% else %}
+<input type="hidden" id="marcadores_pronunciamentos_inicio" value='[]'>
+{% endif %}
+{% if tipo_sessao in marcadores and 'pronunciamentos' in marcadores[tipo_sessao] and 'fim' in marcadores[tipo_sessao]['pronunciamentos'] %}
+<input type="hidden" id="marcadores_pronunciamentos_fim" value='{{ marcadores[tipo_sessao]['pronunciamentos']['fim']|tojson }}'>
+{% else %}
+<input type="hidden" id="marcadores_pronunciamentos_fim" value='[]'>
+{% endif %}
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="corpo_ordem_do_dia" class="form-label">Ordem do Dia</label>
+                                <div class="alert alert-info">
+                                    <small>
+                                        <strong>Marcadores de Início:</strong> 
+{% if tipo_sessao in marcadores and 'ordem_do_dia' in marcadores[tipo_sessao] and 'inicio' in marcadores[tipo_sessao]['ordem_do_dia'] %}
+    {% for marcador in marcadores[tipo_sessao]['ordem_do_dia']['inicio'] %}
+        "{{ marcador }}"{% if not loop.last %}, {% endif %}
+    {% endfor %}
+{% else %}
+    <span class="text-danger">Marcadores não encontrados</span>
+{% endif %}
+                                        <br>
+                                        <strong>Marcadores de Fim:</strong> 
+{% if tipo_sessao in marcadores and 'ordem_do_dia' in marcadores[tipo_sessao] and 'fim' in marcadores[tipo_sessao]['ordem_do_dia'] %}
+    {% for marcador in marcadores[tipo_sessao]['ordem_do_dia']['fim'] %}
+        "{{ marcador }}"{% if not loop.last %}, {% endif %}
+    {% endfor %}
+{% else %}
+    <span class="text-danger">Marcadores não encontrados</span>
+{% endif %}
+                                    </small>
+                                </div>
+                                <textarea class="form-control" id="corpo_ordem_do_dia" name="corpo_ordem_do_dia" rows="6">{{ session.ata.sections.corpo.ordem_do_dia.conteudo }}</textarea>
+                                <button type="button" id="extrair_ordem_do_dia" class="btn btn-sm btn-outline-secondary mt-2">Extrair da Transcrição</button>
+                                {% if tipo_sessao in marcadores and 'ordem_do_dia' in marcadores[tipo_sessao] and 'inicio' in marcadores[tipo_sessao]['ordem_do_dia'] %}
+<input type="hidden" id="marcadores_ordem_do_dia_inicio" value='{{ marcadores[tipo_sessao]['ordem_do_dia']['inicio']|tojson }}'>
+{% else %}
+<input type="hidden" id="marcadores_ordem_do_dia_inicio" value='[]'>
+{% endif %}
+{% if tipo_sessao in marcadores and 'ordem_do_dia' in marcadores[tipo_sessao] and 'fim' in marcadores[tipo_sessao]['ordem_do_dia'] %}
+<input type="hidden" id="marcadores_ordem_do_dia_fim" value='{{ marcadores[tipo_sessao]['ordem_do_dia']['fim']|tojson }}'>
+{% else %}
+<input type="hidden" id="marcadores_ordem_do_dia_fim" value='[]'>
+{% endif %}
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="corpo_votacoes" class="form-label">Votações</label>
+                                <div class="alert alert-info">
+                                    <small>
+                                        <strong>Marcadores de Início:</strong> 
+{% if tipo_sessao in marcadores and 'votacoes' in marcadores[tipo_sessao] and 'inicio' in marcadores[tipo_sessao]['votacoes'] %}
+    {% for marcador in marcadores[tipo_sessao]['votacoes']['inicio'] %}
+        "{{ marcador }}"{% if not loop.last %}, {% endif %}
+    {% endfor %}
+{% else %}
+    <span class="text-danger">Marcadores não encontrados</span>
+{% endif %}
+                                        <br>
+                                        <strong>Marcadores de Fim:</strong> 
+{% if tipo_sessao in marcadores and 'votacoes' in marcadores[tipo_sessao] and 'fim' in marcadores[tipo_sessao]['votacoes'] %}
+    {% for marcador in marcadores[tipo_sessao]['votacoes']['fim'] %}
+        "{{ marcador }}"{% if not loop.last %}, {% endif %}
+    {% endfor %}
+{% else %}
+    <span class="text-danger">Marcadores não encontrados</span>
+{% endif %}
+                                    </small>
+                                </div>
+                                <textarea class="form-control" id="corpo_votacoes" name="corpo_votacoes" rows="6">{{ session.ata.sections.corpo.votacoes.conteudo }}</textarea>
+                                <button type="button" id="extrair_votacoes" class="btn btn-sm btn-outline-secondary mt-2">Extrair da Transcrição</button>
+                                {% if tipo_sessao in marcadores and 'votacoes' in marcadores[tipo_sessao] and 'inicio' in marcadores[tipo_sessao]['votacoes'] %}
+<input type="hidden" id="marcadores_votacoes_inicio" value='{{ marcadores[tipo_sessao]['votacoes']['inicio']|tojson }}'>
+{% else %}
+<input type="hidden" id="marcadores_votacoes_inicio" value='[]'>
+{% endif %}
+{% if tipo_sessao in marcadores and 'votacoes' in marcadores[tipo_sessao] and 'fim' in marcadores[tipo_sessao]['votacoes'] %}
+<input type="hidden" id="marcadores_votacoes_fim" value='{{ marcadores[tipo_sessao]['votacoes']['fim']|tojson }}'>
+{% else %}
+<input type="hidden" id="marcadores_votacoes_fim" value='[]'>
+{% endif %}
+                            </div>
+                        </div>
+                        
+                        <!-- Encerramento da Ata -->
+                        <div class="mb-4">
+                            <h5 class="border-bottom pb-2">Encerramento</h5>
+                            
+                            <div class="mb-3">
+                                <label for="encerramento" class="form-label">Texto de Encerramento</label>
+                                <div class="alert alert-info">
+                                    <small>
+                                        <strong>Marcadores de Início:</strong> 
+{% if tipo_sessao in marcadores and 'encerramento' in marcadores[tipo_sessao] and 'inicio' in marcadores[tipo_sessao]['encerramento'] %}
+    {% for marcador in marcadores[tipo_sessao]['encerramento']['inicio'] %}
+        "{{ marcador }}"{% if not loop.last %}, {% endif %}
+    {% endfor %}
+{% else %}
+    <span class="text-danger">Marcadores não encontrados</span>
+{% endif %}
+                                        <br>
+                                        <strong>Marcadores de Fim:</strong> 
+{% if tipo_sessao in marcadores and 'encerramento' in marcadores[tipo_sessao] and 'fim' in marcadores[tipo_sessao]['encerramento'] %}
+    {% for marcador in marcadores[tipo_sessao]['encerramento']['fim'] %}
+        "{{ marcador }}"{% if not loop.last %}, {% endif %}
+    {% endfor %}
+{% else %}
+    <span class="text-danger">Marcadores não encontrados</span>
+{% endif %}
+                                    </small>
+                                </div>
+                                <textarea class="form-control" id="encerramento" name="encerramento" rows="3">{% if session.ata.sections.encerramento.texto %}{{ session.ata.sections.encerramento.texto }}{% else %}COMO NÃO HÁ MAIS NADA A DELIBERAR, O SENHOR PRESIDENTE LEVANTA A SESSÃO E CONVOCA UMA OUTRA PARA O DIA {{ metadata.dia_proxima_sessao }} DE {{ metadata.mes_proxima_sessao }} DO CORRENTE ANO NO HORÁRIO REGIMENTAL.{% endif %}</textarea>
+                                <button type="button" id="extrair_encerramento" class="btn btn-sm btn-outline-secondary mt-2">Extrair da Transcrição</button>
+                                {% if tipo_sessao in marcadores and 'encerramento' in marcadores[tipo_sessao] and 'inicio' in marcadores[tipo_sessao]['encerramento'] %}
+<input type="hidden" id="marcadores_encerramento_inicio" value='{{ marcadores[tipo_sessao]['encerramento']['inicio']|tojson }}'>
+{% else %}
+<input type="hidden" id="marcadores_encerramento_inicio" value='[]'>
+{% endif %}
+{% if tipo_sessao in marcadores and 'encerramento' in marcadores[tipo_sessao] and 'fim' in marcadores[tipo_sessao]['encerramento'] %}
+<input type="hidden" id="marcadores_encerramento_fim" value='{{ marcadores[tipo_sessao]['encerramento']['fim']|tojson }}'>
+{% else %}
+<input type="hidden" id="marcadores_encerramento_fim" value='[]'>
+{% endif %}
+                            </div>
+                        </div>
+                        
+                        <!-- Campo oculto para armazenar o conteúdo completo da ata -->
+                        <input type="hidden" id="ata_content" name="ata_content" value="">
+                        
+                        {% if is_new %}
+                        <div class="mb-3">
+                            <button type="button" id="usar_transcricao" class="btn btn-info">Usar Transcrição como Base para Todas as Seções</button>
+                        </div>
+                        {% endif %}
+                        
+                        {% if tipo_sessao == 'extraordinaria' or tipo_sessao == 'ordinaria' %}
+                        <div class="mb-4">
+                            <h6>Matérias em Votação</h6>
+                            <div class="mb-3">
+                                <label for="tipo_materia" class="form-label">Tipo de Matéria</label>
+                                <select class="form-select" id="tipo_materia" name="tipo_materia">
+                                    <option value="">Selecione</option>
+                                    <option value="PROJETO DE LEI">Projeto de Lei</option>
+                                    <option value="PROJETO DE RESOLUÇÃO">Projeto de Resolução</option>
+                                    <option value="PROJETO DE DECRETO LEGISLATIVO">Projeto de Decreto Legislativo</option>
+                                    <option value="REQUERIMENTO">Requerimento</option>
+                                    <option value="INDICAÇÃO">Indicação</option>
+                                </select>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="numero_materia" class="form-label">Número</label>
+                                    <input type="text" class="form-control" id="numero_materia" name="numero_materia">
+                                </div>
+                                
+                                <div class="col-md-6 mb-3">
+                                    <label for="ano_materia" class="form-label">Ano</label>
+                                    <input type="number" class="form-control" id="ano_materia" name="ano_materia" value="{{ metadata.ano }}">
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="titulo_materia" class="form-label">Título</label>
+                                <input type="text" class="form-control" id="titulo_materia" name="titulo_materia">
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="resultado_votacao" class="form-label">Resultado da Votação</label>
+                                <select class="form-select" id="resultado_votacao" name="resultado_votacao">
+                                    <option value="">Selecione</option>
+                                    <option value="unanimidade">Aprovado por Unanimidade</option>
+                                    <option value="maioria">Aprovado por Maioria</option>
+                                    <option value="rejeitado">Rejeitado</option>
+                                </select>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <button type="button" id="adicionar_materia" class="btn btn-success">Adicionar Matéria</button>
+                            </div>
+                            
+                            <div id="materias_adicionadas" class="mb-3">
+                                <!-- Aqui serão listadas as matérias adicionadas -->
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <!-- Seção de Encerramento -->
+                <div class="card mb-4">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">Encerramento da Ata</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label class="form-label">Texto de Encerramento</label>
+                            <div class="p-3 border rounded bg-light">
+                                <p>COMO NÃO HÁ MAIS NADA A DELIBERAR, O SENHOR PRESIDENTE LEVANTA A SESSÃO.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <a href="{{ url_for('ata_editor') }}" class="btn btn-secondary">Cancelar</a>
+                    <button type="submit" class="btn btn-primary">
+                        {% if is_new %}Gerar Ata{% else %}Atualizar Ata{% endif %}
+                    </button>
+                </div>
+                
+                <!-- Campos ocultos para armazenar dados adicionais -->
+                <input type="hidden" id="materias_json" name="materias_json" value="">
+                <input type="hidden" id="template_tipo" name="template_tipo" value="{{ tipo_sessao }}">
+                
+                <!-- Visualização completa da ata -->
+                <div class="modal fade" id="previewModal" tabindex="-1" aria-labelledby="previewModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-xl">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="previewModalLabel">Visualização da Ata</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                            </div>
+                            <div class="modal-body">
+                                <div id="ata_preview" class="p-4 border rounded bg-light" style="font-family: 'Times New Roman', Times, serif; white-space: pre-wrap;"></div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Elementos do formulário
+    const tipoSessaoSelect = document.getElementById('tipo_sessao');
+    const previewCabecalho = document.getElementById('preview_cabecalho');
+    const ataContentTextarea = document.getElementById('ata_content');
+    const materiasJson = document.getElementById('materias_json');
+    const materiasAdicionadas = document.getElementById('materias_adicionadas');
+    
+    // Botões e elementos de interação
+    const adicionarMateriaBtn = document.getElementById('adicionar_materia');
+    
+    // Lista de matérias adicionadas
+    let materias = [];
+    
+    // Adicionar matéria à lista
+    function adicionarMateria() {
+        const tipoMateria = document.getElementById('tipo_materia').value;
+        const numeroMateria = document.getElementById('numero_materia').value;
+        const anoMateria = document.getElementById('ano_materia').value;
+        const tituloMateria = document.getElementById('titulo_materia').value;
+        const resultadoVotacao = document.getElementById('resultado_votacao').value;
+        
+        if (!tipoMateria || !numeroMateria || !anoMateria || !resultadoVotacao) {
+            alert('Preencha todos os campos obrigatórios da matéria.');
+            return;
+        }
+        
+        const materia = {
+            tipo: tipoMateria,
+            numero: numeroMateria,
+            ano: anoMateria,
+            titulo: tituloMateria,
+            resultado: resultadoVotacao
+        };
+        
+        materias.push(materia);
+        atualizarListaMaterias();
+        limparCamposMateria();
+        atualizarMaterialJson();
+    }
+    
+    // Atualizar a lista de matérias exibida na página
+    function atualizarListaMaterias() {
+        materiasAdicionadas.innerHTML = '';
+        
+        if (materias.length === 0) {
+            materiasAdicionadas.innerHTML = '<div class="alert alert-info">Nenhuma matéria adicionada.</div>';
+            return;
+        }
+        
+        const lista = document.createElement('ul');
+        lista.className = 'list-group';
+        
+        materias.forEach((materia, index) => {
+            const item = document.createElement('li');
+            item.className = 'list-group-item d-flex justify-content-between align-items-center';
+            
+            let resultadoTexto = '';
+            if (materia.resultado === 'unanimidade') {
+                resultadoTexto = 'Aprovado por Unanimidade';
+            } else if (materia.resultado === 'maioria') {
+                resultadoTexto = 'Aprovado por Maioria';
+            } else {
+                resultadoTexto = 'Rejeitado';
+            }
+            
+            item.innerHTML = `
+                <div>
+                    <strong>${materia.tipo} Nº ${materia.numero}/${materia.ano}</strong>
+                    ${materia.titulo ? `<br>${materia.titulo}` : ''}
+                    <br><span class="badge bg-info">${resultadoTexto}</span>
+                </div>
+                <button type="button" class="btn btn-sm btn-danger remover-materia" data-index="${index}">
+                    <i class="bi bi-trash"></i>
+                </button>
+            `;
+            
+            lista.appendChild(item);
+        });
+        
+        materiasAdicionadas.appendChild(lista);
+        
+        // Adicionar eventos aos botões de remover
+        document.querySelectorAll('.remover-materia').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const index = parseInt(this.getAttribute('data-index'));
+                removerMateria(index);
+            });
+        });
+    }
+    
+    // Remover matéria da lista
+    function removerMateria(index) {
+        materias.splice(index, 1);
+        atualizarListaMaterias();
+        atualizarMaterialJson();
+    }
+    
+    // Limpar campos do formulário de matéria
+    function limparCamposMateria() {
+        document.getElementById('tipo_materia').value = '';
+        document.getElementById('numero_materia').value = '';
+        document.getElementById('titulo_materia').value = '';
+        document.getElementById('resultado_votacao').value = '';
+    }
+    
+    // Atualizar o campo JSON oculto com as matérias
+    function atualizarMaterialJson() {
+        materiasJson.value = JSON.stringify(materias);
+    }
+    
+    // Adicionar event listeners
+    if (tipoSessaoSelect) {
+        tipoSessaoSelect.addEventListener('change', function() {
+            // Recarregar a página com o novo tipo de sessão selecionado
+            const sessionId = document.querySelector('input[name="session_id"]').value;
+            window.location.href = `/edit_ata/${sessionId}?tipo=${this.value}`;
+        });
+    }
+    
+    // Remover event listeners para campos do cabeçalho (não há mais preview)
+    
+    // Adicionar event listener para o botão de adicionar matéria
+    if (adicionarMateriaBtn) {
+        adicionarMateriaBtn.addEventListener('click', adicionarMateria);
+    }
+    
+    // Adicionar event listeners para os botões de extração de conteúdo
+    const btnExtrairExpediente = document.getElementById('extrair_expediente');
+    if (btnExtrairExpediente) {
+        btnExtrairExpediente.addEventListener('click', function() {
+            fetch('/get_transcript/{{ session.session_id }}')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        const marcadoresInicio = ['LEITURA DO EXPEDIENTE', 'EXPEDIENTE DO DIA', 'EXPEDIENTE', 'PROCEDER A LEITURA DO EXPEDIENTE', 'DETERMINE O SENHOR PRIMEIRO SECRETÁRIO A PROCEDER A LEITURA DO EXPEDIENTE'];
+                        const marcadoresFim = ['NÃO HAVENDO MAIS EXPEDIENTE', 'ENCERRADO O EXPEDIENTE', 'ENCERRADA A LEITURA DO EXPEDIENTE', 'ORDEM DO DIA'];
+                        const conteudo = extrairConteudoEntreMarcadores(data.transcript, marcadoresInicio, marcadoresFim);
+                        if (conteudo) {
+                            document.getElementById('corpo_expediente').value = conteudo;
+                        } else {
+                            alert('Não foi possível encontrar o conteúdo do Expediente na transcrição.');
+                        }
+                    } else {
+                        alert('Erro ao carregar transcrição: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Erro:', error);
+                    alert('Erro ao carregar transcrição.');
+                });
+        });
+    }
+    
+    const btnExtrairPronunciamentos = document.getElementById('extrair_pronunciamentos');
+    if (btnExtrairPronunciamentos) {
+        btnExtrairPronunciamentos.addEventListener('click', function() {
+            fetch('/get_transcript/{{ session.session_id }}')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        const marcadoresInicio = ['FACULTA A PALAVRA AOS SENHORES VEREADORES', 'PALAVRA LIVRE', 'PEQUENO EXPEDIENTE'];
+                        const marcadoresFim = ['ORDEM DO DIA', 'PASSA-SE À ORDEM DO DIA', 'ENCERRADO O PEQUENO EXPEDIENTE'];
+                        const conteudo = extrairConteudoEntreMarcadores(data.transcript, marcadoresInicio, marcadoresFim);
+                        if (conteudo) {
+                            document.getElementById('corpo_pronunciamentos').value = conteudo;
+                        } else {
+                            alert('Não foi possível encontrar o conteúdo dos Pronunciamentos na transcrição.');
+                        }
+                    } else {
+                        alert('Erro ao carregar transcrição: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Erro:', error);
+                    alert('Erro ao carregar transcrição.');
+                });
+        });
+    }
+    
+    const btnExtrairOrdemDoDia = document.getElementById('extrair_ordem_do_dia');
+    if (btnExtrairOrdemDoDia) {
+        btnExtrairOrdemDoDia.addEventListener('click', function() {
+            fetch('/get_transcript/{{ session.session_id }}')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        const marcadoresInicio = ['ORDEM DO DIA', 'PASSAMOS À ORDEM DO DIA', 'INICIA-SE A ORDEM DO DIA'];
+                        const marcadoresFim = ['ENCERRADA A ORDEM DO DIA', 'NÃO HAVENDO MAIS NADA A DELIBERAR', 'NADA MAIS HAVENDO A TRATAR'];
+                        const conteudo = extrairConteudoEntreMarcadores(data.transcript, marcadoresInicio, marcadoresFim);
+                        if (conteudo) {
+                            document.getElementById('corpo_ordem_do_dia').value = conteudo;
+                        } else {
+                            alert('Não foi possível encontrar o conteúdo da Ordem do Dia na transcrição.');
+                        }
+                    } else {
+                        alert('Erro ao carregar transcrição: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Erro:', error);
+                    alert('Erro ao carregar transcrição.');
+                });
+        });
+    }
+    
+    const btnExtrairVotacoes = document.getElementById('extrair_votacoes');
+    if (btnExtrairVotacoes) {
+        btnExtrairVotacoes.addEventListener('click', function() {
+            fetch('/get_transcript/{{ session.session_id }}')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        const marcadoresInicio = ['SUBMETE EM VOTAÇÃO', 'COLOCO EM VOTAÇÃO', 'PASSAMOS À VOTAÇÃO'];
+                        const marcadoresFim = ['APROVADO POR UNANIMIDADE', 'APROVADO POR MAIORIA', 'REJEITADO'];
+                        const conteudo = extrairConteudoEntreMarcadores(data.transcript, marcadoresInicio, marcadoresFim);
+                        if (conteudo) {
+                            document.getElementById('corpo_votacoes').value = conteudo;
+                        } else {
+                            alert('Não foi possível encontrar o conteúdo das Votações na transcrição.');
+                        }
+                    } else {
+                        alert('Erro ao carregar transcrição: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Erro:', error);
+                    votacoesTextarea.value = 'Erro ao carregar a transcrição: ' + error;
+                });
+        });
+    }
+    
+    const btnExtrairEncerramento = document.getElementById('extrair_encerramento');
+    if (btnExtrairEncerramento) {
+        btnExtrairEncerramento.addEventListener('click', function() {
+            const encerramentoTextarea = document.getElementById('encerramento');
+            encerramentoTextarea.value = 'Carregando e extraindo encerramento...';
+            
+            // Obter marcadores dinâmicos dos templates JSON
+            const marcadoresInicio = document.getElementById('marcadores_encerramento_inicio').value;
+            const marcadoresFim = document.getElementById('marcadores_encerramento_fim').value;
+            
+            carregarTranscricao()
+                .then(textoCompleto => {
+                    const conteudo = extrairConteudoEntreMarcadores(textoCompleto, marcadoresInicio, marcadoresFim);
+                    
+                    if (conteudo) {
+                        encerramentoTextarea.value = conteudo;
+                    } else {
+                        encerramentoTextarea.value = 'Não foi possível encontrar a seção de encerramento na transcrição.';
+                    }
+                })
+                .catch(error => {
+                    console.error('Erro:', error);
+                    encerramentoTextarea.value = 'Erro ao carregar a transcrição: ' + error;
+                });
+        });
+    }
+    
+    // Adicionar event listener para o botão de gerar ata completa
+    const btnGerarAtaCompleta = document.getElementById('gerar_ata_completa');
+    if (btnGerarAtaCompleta) {
+        btnGerarAtaCompleta.addEventListener('click', function() {
+            const cabecalhoEstrutura = document.getElementById('cabecalho_estrutura').value;
+            const cabecalhoPresidencia = document.getElementById('cabecalho_presidencia').value;
+            const cabecalhoPresenca = document.getElementById('cabecalho_presenca').value;
+            const corpoAbertura = document.getElementById('corpo_abertura').value;
+            const corpoExpediente = document.getElementById('corpo_expediente').value;
+            const corpoPronunciamentos = document.getElementById('corpo_pronunciamentos').value;
+            const corpoOrdemDoDia = document.getElementById('corpo_ordem_do_dia').value;
+            const corpoVotacoes = document.getElementById('corpo_votacoes').value;
+            const encerramento = document.getElementById('encerramento').value;
+            
+            const ataCompleta = [
+                cabecalhoEstrutura,
+                cabecalhoPresidencia,
+                cabecalhoPresenca,
+                '',
+                corpoAbertura,
+                '',
+                corpoExpediente,
+                '',
+                corpoPronunciamentos,
+                '',
+                corpoOrdemDoDia,
+                '',
+                corpoVotacoes,
+                '',
+                encerramento
+            ].join('\n\n');
+            
+            document.getElementById('ata_content').value = ataCompleta;
+            alert('Ata completa gerada com sucesso!');
+        });
+    }
+    
+    // Adicionar event listener para o botão de usar transcrição como base para todas as seções
+    const btnUsarTranscricao = document.getElementById('usar_transcricao');
+    if (btnUsarTranscricao) {
+        btnUsarTranscricao.addEventListener('click', function() {
+            // Obter marcadores dinâmicos dos templates JSON
+            const expedienteMarcadoresInicio = document.getElementById('marcadores_expediente_inicio').value;
+            const expedienteMarcadoresFim = document.getElementById('marcadores_expediente_fim').value;
+            
+            const pronunciamentosMarcadoresInicio = document.getElementById('marcadores_pronunciamentos_inicio').value;
+            const pronunciamentosMarcadoresFim = document.getElementById('marcadores_pronunciamentos_fim').value;
+            
+            const ordemDoDiaMarcadoresInicio = document.getElementById('marcadores_ordem_do_dia_inicio').value;
+            const ordemDoDiaMarcadoresFim = document.getElementById('marcadores_ordem_do_dia_fim').value;
+            
+            const votacoesMarcadoresInicio = document.getElementById('marcadores_votacoes_inicio').value;
+            const votacoesMarcadoresFim = document.getElementById('marcadores_votacoes_fim').value;
+            
+            const encerramentoMarcadoresInicio = document.getElementById('marcadores_encerramento_inicio').value;
+            const encerramentoMarcadoresFim = document.getElementById('marcadores_encerramento_fim').value;
+            
+            carregarTranscricao()
+                .then(textoCompleto => {
+                    // Extrair todas as seções da transcrição usando os marcadores dinâmicos
+                    const expedienteConteudo = extrairConteudoEntreMarcadores(textoCompleto, expedienteMarcadoresInicio, expedienteMarcadoresFim);
+                    if (expedienteConteudo) {
+                        document.getElementById('corpo_expediente').value = expedienteConteudo;
+                    }
+                    
+                    const pronunciamentosConteudo = extrairConteudoEntreMarcadores(textoCompleto, pronunciamentosMarcadoresInicio, pronunciamentosMarcadoresFim);
+                    if (pronunciamentosConteudo) {
+                        document.getElementById('corpo_pronunciamentos').value = pronunciamentosConteudo;
+                    }
+                    
+                    const ordemDoDiaConteudo = extrairConteudoEntreMarcadores(textoCompleto, ordemDoDiaMarcadoresInicio, ordemDoDiaMarcadoresFim);
+                    if (ordemDoDiaConteudo) {
+                        document.getElementById('corpo_ordem_do_dia').value = ordemDoDiaConteudo;
+                    }
+                    
+                    const votacoesConteudo = extrairConteudoEntreMarcadores(textoCompleto, votacoesMarcadoresInicio, votacoesMarcadoresFim);
+                    if (votacoesConteudo) {
+                        document.getElementById('corpo_votacoes').value = votacoesConteudo;
+                    }
+                    
+                    const encerramentoConteudo = extrairConteudoEntreMarcadores(textoCompleto, encerramentoMarcadoresInicio, encerramentoMarcadoresFim);
+                    if (encerramentoConteudo) {
+                        document.getElementById('encerramento').value = encerramentoConteudo;
+                    }
+                    
+                    alert('Todas as seções foram extraídas da transcrição!');
+                })
+                .catch(error => {
+                    console.error('Erro:', error);
+                    alert('Erro ao carregar transcrição: ' + error);
+                });
+        });
+    }
+    
+    // Função para extrair conteúdo entre marcadores
+    function extrairConteudoEntreMarcadores(texto, marcadoresInicio, marcadoresFim) {
+        // Verificar se texto é um array e convertê-lo para string
+        if (Array.isArray(texto)) {
+            texto = texto.join(' ');
+        }
+        
+        // Verificar se texto é uma string
+        if (typeof texto !== 'string') {
+            console.error('O texto não é uma string:', texto);
+            return '';
+        }
+        
+        // Se marcadoresInicio for uma string JSON, convertê-la para array
+        if (typeof marcadoresInicio === 'string') {
+            try {
+                marcadoresInicio = JSON.parse(marcadoresInicio);
+            } catch (e) {
+                console.error('Erro ao converter marcadores de início:', e);
+                marcadoresInicio = [];
+            }
+        }
+        
+        // Se marcadoresFim for uma string JSON, convertê-la para array
+        if (typeof marcadoresFim === 'string') {
+            try {
+                marcadoresFim = JSON.parse(marcadoresFim);
+            } catch (e) {
+                console.error('Erro ao converter marcadores de fim:', e);
+                marcadoresFim = [];
+            }
+        }
+        
+        console.log('Iniciando extração de conteúdo. Tamanho do texto:', texto.length);
+        console.log('Marcadores de início:', marcadoresInicio);
+        console.log('Marcadores de fim:', marcadoresFim);
+        
+        texto = texto.toUpperCase();
+        let inicio = -1;
+        let marcadorEncontrado = '';
+        let fim = texto.length;
+        let marcadorFimEncontrado = '';
+        
+        // Procurar pelo primeiro marcador de início que aparece no texto
+        for (const marcador of marcadoresInicio) {
+            const marcadorUpper = marcador.toUpperCase();
+            const pos = texto.indexOf(marcadorUpper);
+            if (pos !== -1 && (inicio === -1 || pos < inicio)) {
+                inicio = pos + marcadorUpper.length;
+                marcadorEncontrado = marcadorUpper;
+            }
+        }
+        
+        if (inicio === -1) {
+            console.log('Nenhum marcador de início encontrado no texto');
+            return '';
+        }
+        
+        console.log(`Marcador de início encontrado: "${marcadorEncontrado}" na posição ${inicio - marcadorEncontrado.length}`);
+        
+        // Procurar pelo primeiro marcador de fim que aparece depois do início
+        for (const marcador of marcadoresFim) {
+            const marcadorUpper = marcador.toUpperCase();
+            const pos = texto.indexOf(marcadorUpper, inicio);
+            if (pos !== -1 && pos < fim) {
+                fim = pos;
+                marcadorFimEncontrado = marcadorUpper;
+            }
+        }
+        
+        if (fim === texto.length) {
+            console.log('Nenhum marcador de fim encontrado, usando o final do texto');
+        } else {
+            console.log(`Marcador de fim encontrado: "${marcadorFimEncontrado}" na posição ${fim}`);
+        }
+        
+        // Se encontrou ambos os marcadores, retorna o conteúdo entre eles
+        if (inicio !== -1 && fim < texto.length) {
+            const conteudo = texto.substring(inicio, fim).trim();
+            console.log(`Conteúdo extraído com ${conteudo.length} caracteres`);
+            return conteudo;
+        }
+        
+        return '';
+    }
+    
+    // Adicionar event listeners para os botões de extração
+    const extrairExpedienteBtn = document.getElementById('extrair_expediente');
+    const extrairPronunciamentosBtn = document.getElementById('extrair_pronunciamentos');
+    const extrairOrdemDoDiaBtn = document.getElementById('extrair_ordem_do_dia');
+    const extrairVotacoesBtn = document.getElementById('extrair_votacoes');
+    const usarTranscricaoBtn = document.getElementById('usar_transcricao');
+    
+    // Função para carregar a transcrição
+    function carregarTranscricao() {
+        return new Promise((resolve, reject) => {
+            const sessionId = document.querySelector('input[name="session_id"]').value;
+            
+            fetch(`/get_transcript/${sessionId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success && data.transcript) {
+                        // Converter a transcrição para texto
+                        let textoCompleto = "";
+                        
+                        // Verificar o formato da transcrição e processar adequadamente
+                        if (Array.isArray(data.transcript)) {
+                            // Caso 1: Array de objetos com campo 'text'
+                            if (data.transcript.length > 0 && data.transcript[0].hasOwnProperty('text')) {
+                                data.transcript.forEach(segment => {
+                                    if (segment.text) {
+                                        textoCompleto += segment.text + " ";
+                                    }
+                                });
+                            }
+                            // Caso 2: Array de strings
+                            else {
+                                textoCompleto = data.transcript.join(' ');
+                            }
+                        } else if (typeof data.transcript === 'string') {
+                            textoCompleto = data.transcript;
+                        } else {
+                            console.error('Formato de transcrição inesperado:', data.transcript);
+                            reject('Formato de transcrição inesperado');
+                            return;
+                        }
+                        
+                        resolve(textoCompleto.toUpperCase());
+                    } else {
+                        reject('Erro ao carregar a transcrição');
+                    }
+                })
+                .catch(error => {
+                    console.error('Erro ao carregar transcrição:', error);
+                    reject('Erro ao carregar a transcrição');
+                });
+        });
+    }
+    
+    // Adicionar event listener para o botão de extrair expediente
+    if (extrairExpedienteBtn) {
+        extrairExpedienteBtn.addEventListener('click', function() {
+            const expedienteTextarea = document.getElementById('corpo_expediente');
+            expedienteTextarea.value = 'Carregando e extraindo expediente...';
+            
+            // Obter marcadores dinâmicos dos templates JSON
+            const marcadoresInicio = document.getElementById('marcadores_expediente_inicio').value;
+            const marcadoresFim = document.getElementById('marcadores_expediente_fim').value;
+            
+            carregarTranscricao()
+                .then(textoCompleto => {
+                    const conteudo = extrairConteudoEntreMarcadores(textoCompleto, marcadoresInicio, marcadoresFim);
+                    if (conteudo) {
+                        expedienteTextarea.value = conteudo;
+                    } else {
+                        expedienteTextarea.value = 'Não foi possível encontrar a seção de expediente na transcrição.';
+                    }
+                })
+                .catch(error => {
+                    console.error('Erro:', error);
+                    expedienteTextarea.value = 'Erro ao carregar a transcrição: ' + error;
+                });
+        });
+    }
+    
+    // Adicionar event listener para o botão de extrair pronunciamentos
+    if (extrairPronunciamentosBtn) {
+        extrairPronunciamentosBtn.addEventListener('click', function() {
+            const pronunciamentosTextarea = document.getElementById('corpo_pronunciamentos');
+            pronunciamentosTextarea.value = 'Carregando e extraindo pronunciamentos...';
+            
+            // Obter marcadores dinâmicos dos templates JSON
+            const marcadoresInicio = document.getElementById('marcadores_pronunciamentos_inicio').value;
+            const marcadoresFim = document.getElementById('marcadores_pronunciamentos_fim').value;
+            
+            carregarTranscricao()
+                .then(textoCompleto => {
+                    const conteudo = extrairConteudoEntreMarcadores(textoCompleto, marcadoresInicio, marcadoresFim);
+                    
+                    if (conteudo) {
+                        pronunciamentosTextarea.value = conteudo;
+                    } else {
+                        pronunciamentosTextarea.value = 'Não foi possível encontrar a seção de pronunciamentos na transcrição.';
+                    }
+                })
+                .catch(error => {
+                    console.error('Erro:', error);
+                    pronunciamentosTextarea.value = 'Erro ao carregar a transcrição: ' + error;
+                });
+        });
+    }
+    
+    // Adicionar event listener para o botão de extrair ordem do dia
+    if (extrairOrdemDoDiaBtn) {
+        extrairOrdemDoDiaBtn.addEventListener('click', function() {
+            const ordemDoDiaTextarea = document.getElementById('corpo_ordem_do_dia');
+            ordemDoDiaTextarea.value = 'Carregando e extraindo ordem do dia...';
+            
+            // Obter marcadores dinâmicos dos templates JSON
+            const marcadoresInicio = document.getElementById('marcadores_ordem_do_dia_inicio').value;
+            const marcadoresFim = document.getElementById('marcadores_ordem_do_dia_fim').value;
+            
+            carregarTranscricao()
+                .then(textoCompleto => {
+                    const conteudo = extrairConteudoEntreMarcadores(textoCompleto, marcadoresInicio, marcadoresFim);
+                    
+                    if (conteudo) {
+                        ordemDoDiaTextarea.value = conteudo;
+                    } else {
+                        ordemDoDiaTextarea.value = 'Não foi possível encontrar a seção de ordem do dia na transcrição.';
+                    }
+                })
+                .catch(error => {
+                    console.error('Erro:', error);
+                    ordemDoDiaTextarea.value = 'Erro ao carregar a transcrição: ' + error;
+                });
+        });
+    }
+    
+    // Adicionar event listener para o botão de extrair votações
+    if (extrairVotacoesBtn) {
+        extrairVotacoesBtn.addEventListener('click', function() {
+            const votacoesTextarea = document.getElementById('corpo_votacoes');
+            votacoesTextarea.value = 'Carregando e extraindo votações...';
+            
+            // Obter marcadores dinâmicos dos templates JSON
+            const marcadoresInicio = document.getElementById('marcadores_votacoes_inicio').value;
+            const marcadoresFim = document.getElementById('marcadores_votacoes_fim').value;
+            
+            carregarTranscricao()
+                .then(textoCompleto => {
+                    const conteudo = extrairConteudoEntreMarcadores(textoCompleto, marcadoresInicio, marcadoresFim);
+                    
+                    if (conteudo) {
+                        votacoesTextarea.value = conteudo;
+                    } else {
+                        votacoesTextarea.value = 'Não foi possível encontrar a seção de votações na transcrição.';
+                    }
+                })
+                .catch(error => {
+                    console.error('Erro:', error);
+                    votacoesTextarea.value = 'Erro ao carregar a transcrição: ' + error;
+                });
+        });
+    }
+    
+    // Adicionar event listener para o botão de usar transcrição como base para todas as seções
+    if (usarTranscricaoBtn) {
+        usarTranscricaoBtn.addEventListener('click', function() {
+            // Mostrar indicador de carregamento
+            alert('Carregando transcrição e preenchendo todas as seções...');
+            
+            // Acionar todos os botões de extração
+            if (extrairExpedienteBtn) extrairExpedienteBtn.click();
+            if (extrairPronunciamentosBtn) extrairPronunciamentosBtn.click();
+            if (extrairOrdemDoDiaBtn) extrairOrdemDoDiaBtn.click();
+            if (extrairVotacoesBtn) extrairVotacoesBtn.click();
+        });
+    }
+    
+    // Inicializar a lista de matérias
+    atualizarListaMaterias();
+    
+    // Adicionar event listener para o envio do formulário
+    const form = document.querySelector('form');
+    if (form) {
+        form.addEventListener('submit', function(event) {
+            // Impedir o envio padrão do formulário
+            event.preventDefault();
+            
+            // Obter todos os campos de texto das seções
+            const cabecalhoEstrutura = document.getElementById('cabecalho_estrutura').value;
+            const cabecalhoPresidencia = document.getElementById('cabecalho_presidencia').value;
+            const cabecalhoPresenca = document.getElementById('cabecalho_presenca').value;
+            
+            const corpoAbertura = document.getElementById('corpo_abertura').value;
+            const corpoExpediente = document.getElementById('corpo_expediente').value;
+            const corpoPronunciamentos = document.getElementById('corpo_pronunciamentos').value;
+            const corpoOrdemDoDia = document.getElementById('corpo_ordem_do_dia').value;
+            const corpoVotacoes = document.getElementById('corpo_votacoes').value;
+            
+            const encerramento = document.getElementById('encerramento').value;
+            
+            // Substituir os placeholders pelos valores dos campos
+            const tipoSessao = document.getElementById('tipo_sessao').value;
+            const numeroSessao = document.getElementById('numero_sessao').value;
+            const dia = document.getElementById('dia').value;
+            const mes = document.getElementById('mes').value;
+            const ano = document.getElementById('ano').value;
+            const cidade = document.getElementById('cidade').value;
+            const presidente = document.getElementById('presidente').value;
+            const primeiroSecretario = document.getElementById('primeiro_secretario').value;
+            const segundoSecretario = document.getElementById('segundo_secretario').value;
+            const hora = document.getElementById('hora').value;
+            const minutos = document.getElementById('minutos').value;
+            const vereadoresPresentes = document.getElementById('vereadores_presentes').value;
+            const numeroPresentes = document.getElementById('numero_presentes').value;
+            const numeroPresentesExtenso = document.getElementById('numero_presentes_extenso').value;
+            
+            // Substituir os placeholders no cabeçalho
+            let cabecalho = cabecalhoEstrutura
+                .replace('{numero_sessao}', numeroSessao)
+                .replace('{numero_sessao_legislativa}', document.getElementById('numero_sessao_legislativa').value)
+                .replace('{numero_legislatura}', document.getElementById('numero_legislatura').value)
+                .replace('{cidade}', cidade)
+                .replace('{dia}', dia)
+                .replace('{mes}', mes)
+                .replace('{ano}', ano);
+                
+            let presidencia = cabecalhoPresidencia
+                .replace('{presidente}', presidente)
+                .replace('{primeiro_secretario}', primeiroSecretario)
+                .replace('{segundo_secretario}', segundoSecretario);
+                
+            let presenca = cabecalhoPresenca
+                .replace('{hora}', hora)
+                .replace('{minutos}', minutos)
+                .replace('{vereadores_presentes}', vereadoresPresentes)
+                .replace('{numero_presentes}', numeroPresentes)
+                .replace('{numero_presentes_extenso}', numeroPresentesExtenso);
+            
+            // Substituir os placeholders no corpo
+            let abertura = corpoAbertura
+                .replace('{vereadores_presentes}', vereadoresPresentes);
+            
+            // Substituir os placeholders no encerramento
+            let encerramentoTexto = encerramento;
+            if (tipoSessao === 'ordinaria') {
+                encerramentoTexto = encerramentoTexto
+                    .replace('{dia_proxima_sessao}', document.getElementById('dia_proxima_sessao').value)
+                    .replace('{mes_proxima_sessao}', document.getElementById('mes_proxima_sessao').value);
+            }
+            
+            // Combinar todas as seções em um único conteúdo
+            const conteudoCompleto = [
+                cabecalho,
+                '',
+                presidencia,
+                '',
+                presenca,
+                '',
+                abertura,
+                '',
+                corpoExpediente,
+                '',
+                corpoPronunciamentos,
+                '',
+                corpoOrdemDoDia,
+                '',
+                corpoVotacoes,
+                '',
+                encerramentoTexto
+            ].join('\n');
+            
+            // Definir o conteúdo completo no campo oculto
+            document.getElementById('ata_content').value = conteudoCompleto;
+            
+            // Enviar o formulário
+            form.submit();
+        });
+    }
+});
+</script>
+{% endblock %}

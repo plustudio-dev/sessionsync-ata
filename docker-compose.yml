@@ -1,0 +1,83 @@
+version: '3'
+
+services:
+  frontend:
+    build: 
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./data:/app/data
+      - ./uploads:/app/uploads
+    environment:
+      - PREPROCESSING_SERVICE_URL=http://preprocessing:8001
+      - TRANSCRIPTION_SERVICE_URL=http://transcription:8002
+      - FLASK_ENV=production
+      - MAX_CONTENT_LENGTH=1073741824  # 1GB para uploads grandes
+      - PYTHONUNBUFFERED=1  # Garantir que os logs sejam exibidos corretamente
+    networks:
+      - session-sync-network
+    depends_on:
+      - preprocessing
+      - transcription
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 4G
+
+  preprocessing:
+    build: ./preprocessing
+    ports:
+      - "8001:8001"
+    volumes:
+      - ./data:/app/data
+      - ./uploads:/app/uploads
+      - ./temp:/app/temp
+    environment:
+      - TRANSCRIPTION_SERVICE_URL=http://transcription:8002
+      - FLASK_ENV=production
+      - OMP_NUM_THREADS=1
+      - MKL_NUM_THREADS=1
+    networks:
+      - session-sync-network
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 2G
+
+  transcription:
+    build: ./transcription
+    ports:
+      - "8002:8002"
+    volumes:
+      - ./data:/app/data
+      - ./temp:/app/temp
+      - ./models:/root/.cache/whisper  # Persistir modelos baixados
+    environment:
+      - FLASK_ENV=production
+      - OMP_NUM_THREADS=1
+      - MKL_NUM_THREADS=1
+      - WHISPER_MODEL=medium  # Usando o modelo medium conforme solicitado
+    networks:
+      - session-sync-network
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '4'
+          memory: 8G
+
+networks:
+  session-sync-network:
+    driver: bridge
+
+volumes:
+  data:
+  uploads:
+  temp:
+  models:

@@ -1,0 +1,14 @@
+# Dependências comuns
+flask==2.0.1
+requests==2.26.0
+python-dotenv==0.19.0
+werkzeug==2.0.1
+flask-wtf==0.15.1
+
+# Dependências do serviço de pré-processamento
+# Simplificado para usar apenas FFmpeg
+
+# Dependências do serviço de transcrição
+openai-whisper==20231117
+torch==2.0.1
+tqdm==4.66.1

@@ -1,0 +1,294 @@
+{% extends "base.html" %}
+
+{% block title %}Session Sync - Gerar Nova Ata{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <h1>Gerar Nova Ata</h1>
+            <h4 class="text-muted">{{ session.title }}</h4>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <form method="POST" action="{{ url_for('process_ata') }}">
+                <input type="hidden" name="session_id" value="{{ session.session_id }}">
+                
+                <div class="mb-3">
+                    <label for="tipo_sessao" class="form-label">Tipo de Sessão:</label>
+                    <select class="form-select" id="tipo_sessao" name="tipo_sessao" required>
+                        <option value="">Selecione o tipo</option>
+                        <option value="ordinaria">Ordinária</option>
+                        <option value="extraordinaria">Extraordinária</option>
+                        <option value="solene">Solene</option>
+                    </select>
+                </div>
+                
+                <div id="campos_ordinaria" style="display: none;">
+                    <!-- Campos comuns para todos os tipos de sessão -->
+                    <div class="mb-3">
+                        <label for="numero_sessao" class="form-label">Número da Sessão *</label>
+                        <input type="number" class="form-control" id="numero_sessao" name="numero_sessao" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="dia" class="form-label">Dia *</label>
+                        <input type="number" class="form-control" id="dia" name="dia" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="mes" class="form-label">Mês *</label>
+                        <input type="text" class="form-control" id="mes" name="mes" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="ano" class="form-label">Ano *</label>
+                        <input type="number" class="form-control" id="ano" name="ano" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="cidade" class="form-label">Cidade *</label>
+                        <input type="text" class="form-control" id="cidade" name="cidade" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="presidente" class="form-label">Presidente *</label>
+                        <input type="text" class="form-control" id="presidente" name="presidente" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="periodo" class="form-label">Período *</label>
+                        <input type="text" class="form-control" id="periodo" name="periodo" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="numero_sessao_legislativa" class="form-label">Número da Sessão Legislativa *</label>
+                        <input type="number" class="form-control" id="numero_sessao_legislativa" name="numero_sessao_legislativa" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="numero_legislatura" class="form-label">Número da Legislatura *</label>
+                        <input type="number" class="form-control" id="numero_legislatura" name="numero_legislatura" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="primeiro_secretario" class="form-label">Primeiro Secretário *</label>
+                        <input type="text" class="form-control" id="primeiro_secretario" name="primeiro_secretario" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="segundo_secretario" class="form-label">Segundo Secretário *</label>
+                        <input type="text" class="form-control" id="segundo_secretario" name="segundo_secretario" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="hora" class="form-label">Hora *</label>
+                        <input type="number" class="form-control" id="hora" name="hora" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="minutos" class="form-label">Minutos *</label>
+                        <input type="number" class="form-control" id="minutos" name="minutos" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="vereadores_presentes" class="form-label">Vereadores Presentes *</label>
+                        <textarea class="form-control" id="vereadores_presentes" name="vereadores_presentes" rows="3" required></textarea>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="numero_presentes" class="form-label">Número de Presentes *</label>
+                        <input type="number" class="form-control" id="numero_presentes" name="numero_presentes" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="dia_proxima_sessao" class="form-label">Dia da Próxima Sessão *</label>
+                        <input type="number" class="form-control" id="dia_proxima_sessao" name="dia_proxima_sessao" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="mes_proxima_sessao" class="form-label">Mês da Próxima Sessão *</label>
+                        <input type="text" class="form-control" id="mes_proxima_sessao" name="mes_proxima_sessao" required>
+                    </div>
+                </div>
+                
+                <div id="campos_extraordinaria" style="display: none;">
+                    <!-- Campos comuns para todos os tipos de sessão -->
+                    <div class="mb-3">
+                        <label for="numero_sessao" class="form-label">Número da Sessão *</label>
+                        <input type="number" class="form-control" id="numero_sessao" name="numero_sessao" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="dia" class="form-label">Dia *</label>
+                        <input type="number" class="form-control" id="dia" name="dia" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="mes" class="form-label">Mês *</label>
+                        <input type="text" class="form-control" id="mes" name="mes" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="ano" class="form-label">Ano *</label>
+                        <input type="number" class="form-control" id="ano" name="ano" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="cidade" class="form-label">Cidade *</label>
+                        <input type="text" class="form-control" id="cidade" name="cidade" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="presidente" class="form-label">Presidente *</label>
+                        <input type="text" class="form-control" id="presidente" name="presidente" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="numero_sessao_legislativa" class="form-label">Número da Sessão Legislativa *</label>
+                        <input type="number" class="form-control" id="numero_sessao_legislativa" name="numero_sessao_legislativa" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="numero_legislatura" class="form-label">Número da Legislatura *</label>
+                        <input type="number" class="form-control" id="numero_legislatura" name="numero_legislatura" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="primeiro_secretario" class="form-label">Primeiro Secretário *</label>
+                        <input type="text" class="form-control" id="primeiro_secretario" name="primeiro_secretario" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="segundo_secretario" class="form-label">Segundo Secretário *</label>
+                        <input type="text" class="form-control" id="segundo_secretario" name="segundo_secretario" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="hora" class="form-label">Hora *</label>
+                        <input type="number" class="form-control" id="hora" name="hora" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="minutos" class="form-label">Minutos *</label>
+                        <input type="number" class="form-control" id="minutos" name="minutos" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="vereadores_presentes" class="form-label">Vereadores Presentes *</label>
+                        <textarea class="form-control" id="vereadores_presentes" name="vereadores_presentes" rows="3" required></textarea>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="numero_presentes" class="form-label">Número de Presentes *</label>
+                        <input type="number" class="form-control" id="numero_presentes" name="numero_presentes" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="numero_artigo" class="form-label">Número do Artigo do Regimento *</label>
+                        <input type="text" class="form-control" id="numero_artigo" name="numero_artigo" required>
+                    </div>
+                </div>
+                
+                <div id="campos_solene" style="display: none;">
+                    <!-- Campos comuns para todos os tipos de sessão -->
+                    <div class="mb-3">
+                        <label for="numero_sessao" class="form-label">Número da Sessão *</label>
+                        <input type="number" class="form-control" id="numero_sessao" name="numero_sessao" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="dia" class="form-label">Dia *</label>
+                        <input type="number" class="form-control" id="dia" name="dia" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="mes" class="form-label">Mês *</label>
+                        <input type="text" class="form-control" id="mes" name="mes" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="ano" class="form-label">Ano *</label>
+                        <input type="number" class="form-control" id="ano" name="ano" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="cidade" class="form-label">Cidade *</label>
+                        <input type="text" class="form-control" id="cidade" name="cidade" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="presidente" class="form-label">Presidente *</label>
+                        <input type="text" class="form-control" id="presidente" name="presidente" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="motivo_sessao" class="form-label">Motivo da Sessão *</label>
+                        <input type="text" class="form-control" id="motivo_sessao" name="motivo_sessao" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="hora" class="form-label">Hora *</label>
+                        <input type="number" class="form-control" id="hora" name="hora" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="minutos" class="form-label">Minutos *</label>
+                        <input type="number" class="form-control" id="minutos" name="minutos" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="vereadores_presentes" class="form-label">Vereadores Presentes *</label>
+                        <textarea class="form-control" id="vereadores_presentes" name="vereadores_presentes" rows="3" required></textarea>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="numero_presentes" class="form-label">Número de Presentes *</label>
+                        <input type="number" class="form-control" id="numero_presentes" name="numero_presentes" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="autoridades_presentes" class="form-label">Autoridades Presentes *</label>
+                        <textarea class="form-control" id="autoridades_presentes" name="autoridades_presentes" rows="3" required></textarea>
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <a href="{{ url_for('ata_editor') }}" class="btn btn-secondary">Cancelar</a>
+                    <button type="submit" class="btn btn-primary">Gerar Ata</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const tipoSessaoSelect = document.getElementById('tipo_sessao');
+    const camposOrdinaria = document.getElementById('campos_ordinaria');
+    const camposExtraordinaria = document.getElementById('campos_extraordinaria');
+    const camposSolene = document.getElementById('campos_solene');
+    
+    // Mostrar/ocultar campos com base no tipo de sessão selecionado
+    tipoSessaoSelect.addEventListener('change', function() {
+        const tipoSelecionado = this.value;
+        
+        // Ocultar todos os campos específicos
+        camposOrdinaria.style.display = 'none';
+        camposExtraordinaria.style.display = 'none';
+        camposSolene.style.display = 'none';
+        
+        // Mostrar campos específicos para o tipo selecionado
+        if (tipoSelecionado === 'ordinaria') {
+            camposOrdinaria.style.display = 'block';
+        } else if (tipoSelecionado === 'extraordinaria') {
+            camposExtraordinaria.style.display = 'block';
+        } else if (tipoSelecionado === 'solene') {
+            camposSolene.style.display = 'block';
+        }
+    });
+});
+</script>
+{% endblock %}

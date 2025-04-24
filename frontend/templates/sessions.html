@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block title %}Session Sync - Sessões{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <h1 class="mb-4">Sessões Processadas</h1>
+        
+        {% if sessions %}
+            <div class="table-responsive">
+                <table class="table table-striped table-hover">
+                    <thead>
+                        <tr>
+                            <th>Título</th>
+                            <th>Data</th>
+                            <th>Status</th>
+                            <th>Enviado em</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for session in sessions %}
+                            <tr>
+                                <td>{{ session.title }}</td>
+                                <td>{{ session.date }}</td>
+                                <td>
+                                    {% if session.status == 'uploaded' %}
+                                        <span class="badge bg-secondary">Enviado</span>
+                                    {% elif session.status == 'preprocessing' %}
+                                        <span class="badge bg-info">Pré-processando</span>
+                                    {% elif session.status == 'transcribing' %}
+                                        <span class="badge bg-primary">Transcrevendo</span>
+                                    {% elif session.status == 'completed' %}
+                                        <span class="badge bg-success">Concluído</span>
+                                    {% elif session.status == 'error' %}
+                                        <span class="badge bg-danger">Erro</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">{{ session.status }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ session.upload_time.split('T')[0] }}</td>
+                                <td>
+                                    <a href="{{ url_for('session_status_endpoint', session_id=session.session_id) }}" class="btn btn-sm btn-outline-primary">Detalhes</a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="alert alert-info">
+                Nenhuma sessão foi processada ainda. <a href="{{ url_for('index') }}">Faça upload de um áudio</a> para começar.
+            </div>
+        {% endif %}
+        
+        <a href="{{ url_for('index') }}" class="btn btn-primary mt-3">Novo Upload</a>
+    </div>
+</div>
+{% endblock %}

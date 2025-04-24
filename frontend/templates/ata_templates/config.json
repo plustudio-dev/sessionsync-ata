@@ -1,0 +1,7 @@
+{
+  "tipos_sessao": {
+    "ordinaria": "ordinaria.json",
+    "extraordinaria": "extraordinaria.json",
+    "solene": "solene.json"
+  }
+}

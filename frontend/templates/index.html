@@ -1,0 +1,297 @@
+{% extends "base.html" %}
+
+{% block title %}Session Sync - Início{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <h1 class="mb-4">Processamento de Áudios de Sessões Legislativas</h1>
+        <p class="lead">
+            Faça upload de áudios de sessões legislativas para processamento e transcrição automática.
+        </p>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Upload de Áudio</h5>
+            </div>
+            <div class="card-body">
+                <form action="{{ url_for('upload_file') }}" method="post" enctype="multipart/form-data">
+                    <div class="mb-3">
+                        <label for="audio_file" class="form-label">Arquivo de Áudio</label>
+                        <input type="file" class="form-control" id="audio_file" name="audio_file" accept="audio/*" required>
+                        <div class="form-text">Formatos suportados: MP3, WAV, M4A, etc. (Máximo 500MB)</div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="title" class="form-label">Título da Sessão</label>
+                        <input type="text" class="form-control" id="title" name="title" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="date" class="form-label">Data da Sessão</label>
+                        <input type="date" class="form-control" id="date" name="date" required>
+                    </div>
+                    
+                    <h5 class="mt-4 mb-3">Informações para Estruturação da Ata</h5>
+                    
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label for="numero_sessao" class="form-label">Número da Sessão</label>
+                                <input type="number" class="form-control" id="numero_sessao" name="numero_sessao" min="1">
+                            </div>
+                        </div>
+                        <div class="col-md-8">
+                            <div class="mb-3">
+                                <label for="periodo" class="form-label">Período</label>
+                                <select class="form-select" id="periodo" name="periodo">
+                                    <option value="">Selecione...</option>
+                                    <option value="1º PERÍODO ORDINÁRIO">1º Período Ordinário</option>
+                                    <option value="2º PERÍODO ORDINÁRIO">2º Período Ordinário</option>
+                                    <option value="PERÍODO EXTRAORDINÁRIO">Período Extraordinário</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label for="numero_sessao_legislativa" class="form-label">Número da Sessão Legislativa</label>
+                                <input type="number" class="form-control" id="numero_sessao_legislativa" name="numero_sessao_legislativa" min="1">
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label for="numero_legislatura" class="form-label">Número da Legislatura</label>
+                                <input type="number" class="form-control" id="numero_legislatura" name="numero_legislatura" min="1">
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label for="cidade" class="form-label">Cidade</label>
+                                <input type="text" class="form-control" id="cidade" name="cidade" value="ANGICOS">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label for="hora" class="form-label">Hora de Início</label>
+                                <input type="number" class="form-control" id="hora" name="hora" min="0" max="23">
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label for="minutos" class="form-label">Minutos</label>
+                                <input type="number" class="form-control" id="minutos" name="minutos" min="0" max="59">
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label for="numero_presentes" class="form-label">Número de Presentes</label>
+                                <input type="number" class="form-control" id="numero_presentes" name="numero_presentes" min="0">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="presidente" class="form-label">Presidente</label>
+                        <select class="form-select" id="presidente" name="presidente">
+                            <option value="">Selecione o Presidente...</option>
+                            <!-- Opções serão carregadas via JavaScript -->
+                        </select>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="primeiro_secretario" class="form-label">1º Secretário</label>
+                                <select class="form-select" id="primeiro_secretario" name="primeiro_secretario">
+                                    <option value="">Selecione o 1º Secretário...</option>
+                                    <!-- Opções serão carregadas via JavaScript -->
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="segundo_secretario" class="form-label">2º Secretário</label>
+                                <select class="form-select" id="segundo_secretario" name="segundo_secretario">
+                                    <option value="">Selecione o 2º Secretário...</option>
+                                    <!-- Opções serão carregadas via JavaScript -->
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="vereadores_presentes" class="form-label">Vereadores Presentes</label>
+                        <div id="vereadores-container" class="border rounded p-3 mb-3">
+                            <!-- Checkboxes serão carregados via JavaScript -->
+                        </div>
+                        <input type="hidden" id="vereadores_presentes" name="vereadores_presentes">
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary">Enviar para Processamento</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Informações</h5>
+            </div>
+            <div class="card-body">
+                <h6>Fluxo de Processamento</h6>
+                <ol>
+                    <li>Upload do arquivo de áudio</li>
+                    <li>Pré-processamento (segmentação e normalização)</li>
+                    <li>Transcrição com timestamps</li>
+                    <li>Geração de ata estruturada</li>
+                </ol>
+                
+                <h6>Recursos</h6>
+                <ul>
+                    <li>Segmentação automática de áudios longos</li>
+                    <li>Detecção de silêncio e ruído</li>
+                    <li>Transcrição otimizada para português brasileiro</li>
+                    <li>Processamento paralelo para maior velocidade</li>
+                </ul>
+                
+                <a href="{{ url_for('list_sessions') }}" class="btn btn-outline-primary mt-3">Ver Sessões Processadas</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Carregar a hora atual
+        const now = new Date();
+        document.getElementById('hora').value = now.getHours();
+        document.getElementById('minutos').value = now.getMinutes();
+        
+        // Carregar lista de vereadores
+        fetch('/static/vereadores.json')
+            .then(response => response.json())
+            .then(data => {
+                const vereadores = data.vereadores;
+                
+                // Preencher selects de presidente e secretários
+                const presidenteSelect = document.getElementById('presidente');
+                const primeiroSecretarioSelect = document.getElementById('primeiro_secretario');
+                const segundoSecretarioSelect = document.getElementById('segundo_secretario');
+                
+                vereadores.forEach(vereador => {
+                    // Adicionar opções aos selects
+                    presidenteSelect.innerHTML += `<option value="${vereador}">${vereador}</option>`;
+                    primeiroSecretarioSelect.innerHTML += `<option value="${vereador}">${vereador}</option>`;
+                    segundoSecretarioSelect.innerHTML += `<option value="${vereador}">${vereador}</option>`;
+                });
+                
+                // Criar checkboxes para vereadores presentes
+                const vereadoresContainer = document.getElementById('vereadores-container');
+                const vereadoresPresentes = document.getElementById('vereadores_presentes');
+                
+                // Criar array para armazenar os vereadores selecionados
+                let selectedVereadores = [];
+                
+                vereadores.forEach((vereador, index) => {
+                    const checkboxId = `vereador-${index}`;
+                    
+                    // Criar div para cada checkbox
+                    const checkboxDiv = document.createElement('div');
+                    checkboxDiv.className = 'form-check';
+                    
+                    // Criar checkbox
+                    const checkbox = document.createElement('input');
+                    checkbox.type = 'checkbox';
+                    checkbox.className = 'form-check-input vereador-checkbox';
+                    checkbox.id = checkboxId;
+                    checkbox.value = vereador;
+                    checkbox.checked = true; // Todos marcados por padrão
+                    
+                    // Adicionar vereador ao array de selecionados
+                    selectedVereadores.push(vereador);
+                    
+                    // Adicionar evento de mudança
+                    checkbox.addEventListener('change', function() {
+                        if (this.checked) {
+                            selectedVereadores.push(vereador);
+                        } else {
+                            const index = selectedVereadores.indexOf(vereador);
+                            if (index > -1) {
+                                selectedVereadores.splice(index, 1);
+                            }
+                        }
+                        
+                        // Atualizar o campo hidden
+                        vereadoresPresentes.value = selectedVereadores.join(', ');
+                    });
+                    
+                    // Criar label
+                    const label = document.createElement('label');
+                    label.className = 'form-check-label';
+                    label.htmlFor = checkboxId;
+                    label.textContent = vereador;
+                    
+                    // Adicionar elementos ao div
+                    checkboxDiv.appendChild(checkbox);
+                    checkboxDiv.appendChild(label);
+                    
+                    // Adicionar div ao container
+                    vereadoresContainer.appendChild(checkboxDiv);
+                });
+                
+                // Inicializar o campo hidden com todos os vereadores
+                vereadoresPresentes.value = selectedVereadores.join(', ');
+                
+                // Adicionar botões para selecionar/deselecionar todos
+                const buttonsDiv = document.createElement('div');
+                buttonsDiv.className = 'mt-2';
+                
+                const selectAllBtn = document.createElement('button');
+                selectAllBtn.type = 'button';
+                selectAllBtn.className = 'btn btn-sm btn-outline-primary me-2';
+                selectAllBtn.textContent = 'Selecionar Todos';
+                selectAllBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    document.querySelectorAll('.vereador-checkbox').forEach(cb => {
+                        cb.checked = true;
+                    });
+                    selectedVereadores = [...vereadores];
+                    vereadoresPresentes.value = selectedVereadores.join(', ');
+                });
+                
+                const deselectAllBtn = document.createElement('button');
+                deselectAllBtn.type = 'button';
+                deselectAllBtn.className = 'btn btn-sm btn-outline-secondary';
+                deselectAllBtn.textContent = 'Deselecionar Todos';
+                deselectAllBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    document.querySelectorAll('.vereador-checkbox').forEach(cb => {
+                        cb.checked = false;
+                    });
+                    selectedVereadores = [];
+                    vereadoresPresentes.value = '';
+                });
+                
+                buttonsDiv.appendChild(selectAllBtn);
+                buttonsDiv.appendChild(deselectAllBtn);
+                vereadoresContainer.appendChild(buttonsDiv);
+            })
+            .catch(error => {
+                console.error('Erro ao carregar lista de vereadores:', error);
+            });
+    });
+</script>
+{% endblock %}

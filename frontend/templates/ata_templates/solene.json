@@ -1,0 +1,37 @@
+{
+  "cabecalho": {
+    "estrutura": "ATA DA SESSÃO SOLENE DE {motivo_sessao} DA CÂMARA MUNICIPAL DE {cidade}, REALIZADA NO DIA {dia} DE {mes} DE {ano}.",
+    "presidencia": "SOB A PRESIDÊNCIA DO SENHOR VEREADOR {presidente}.",
+    "presenca": "ÀS {hora}H{minutos}, PRESENTES OS SENHORES VEREADORES: {vereadores_presentes}. CONSULTADO O LIVRO DE PRESENÇA DOS SENHORES VEREADORES, QUE ACUSA O COMPARECIMENTO DE {numero_presentes} ({numero_presentes_extenso}) VEREADORES, FOI ABERTA À SESSÃO."
+  },
+  "corpo": {
+    "abertura": [
+      "O SENHOR PRESIDENTE DECLARA ABERTA A PRESENTE SESSÃO SOLENE, DESTINADA A {motivo_sessao}.",
+      "O SENHOR PRESIDENTE CONVIDA PARA COMPOR A MESA: {autoridades_presentes}."
+    ],
+    "homenagens": {
+      "marcadores": {
+        "inicio": ["HOMENAGENS", "ENTREGA DE HOMENAGENS", "HOMENAGEADOS"],
+        "fim": ["ENCERRADAS AS HOMENAGENS", "PRONUNCIAMENTOS", "PALAVRA LIVRE"]
+      },
+      "instrucao": "O SENHOR PRESIDENTE PROCEDE À ENTREGA DAS HOMENAGENS:",
+      "template": "RECEBE A HOMENAGEM O(A) SENHOR(A) {nome}, {justificativa}"
+    },
+    "pronunciamentos": {
+      "marcadores": {
+        "inicio": ["PRONUNCIAMENTOS", "PALAVRA LIVRE", "DISCURSOS"],
+        "fim": ["ENCERRADOS OS PRONUNCIAMENTOS", "ENCERRAMENTO", "NADA MAIS HAVENDO A TRATAR"]
+      },
+      "instrucao": "O SENHOR PRESIDENTE FACULTA A PALAVRA AOS PRESENTES:",
+      "template": "FEZ USO DA PALAVRA O(A) SENHOR(A) {nome}, {resumo}"
+    }
+  },
+  "encerramento": {
+    "marcadores": {
+      "inicio": ["NADA MAIS HAVENDO A TRATAR", "NÃO HAVENDO MAIS NADA A DELIBERAR", "COMO NÃO HÁ MAIS NADA A DELIBERAR"],
+      "fim": ["ENCERRADA A SESSÃO", "SESSÃO ENCERRADA", "ESTÁ ENCERRADA A SESSÃO"]
+    },
+    "template": "NADA MAIS HAVENDO A TRATAR, O SENHOR PRESIDENTE AGRADECE A PRESENÇA DE TODOS E DECLARA ENCERRADA A PRESENTE SESSÃO SOLENE.",
+    "campos_obrigatorios": []
+  }
+}

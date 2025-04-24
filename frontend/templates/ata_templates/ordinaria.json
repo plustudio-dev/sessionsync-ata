@@ -1,0 +1,68 @@
+{
+  "cabecalho": {
+    "estrutura": "ATA DA {numero_sessao}ª REUNIÃO DO {periodo} DA {numero_sessao_legislativa}ª SESSÃO LEGISLATIVA DA {numero_legislatura}ª LEGISLATURA DA CÂMARA MUNICIPAL DE {cidade}, REALIZADA NO DIA {dia} DE {mes} DE {ano}.",
+    "presidencia": "SOB A PRESIDÊNCIA DOS SENHORES VEREADORES: {presidente}, PRESIDENTE; {primeiro_secretario}, 1º SECRETÁRIO; {segundo_secretario}, 2º SECRETÁRIO.",
+    "presenca": "ÀS {hora}H{minutos}, PRESENTES OS SENHORES VEREADORES: {vereadores_presentes}. CONSULTADO O LIVRO DE PRESENÇA DOS SENHORES VEREADORES, QUE ACUSA O COMPARECIMENTO DE {numero_presentes} ({numero_presentes_extenso}) VEREADORES, FOI ABERTA À SESSÃO."
+  },
+  "corpo": {
+    "abertura": [
+      "O SENHOR PRESIDENTE PROCEDE À CHAMADA NOMINAL DOS SENHORES VEREADORES PRESENTES. {vereadores_presentes}",
+      "O SENHOR PRESIDENTE CONVOCA O SENHOR 1º SECRETÁRIO A PROCEDER A LEITURA DO EXPEDIENTE:"
+    ],
+    "expediente": {
+      "marcadores": {
+        "inicio": ["LEITURA DO EXPEDIENTE", "EXPEDIENTE DO DIA", "EXPEDIENTE"],
+        "fim": ["NÃO HAVENDO MAIS EXPEDIENTE", "ENCERRADO O EXPEDIENTE", "ORDEM DO DIA"]
+      },
+      "instrucao": "Transcrever integralmente o conteúdo entre 'LEITURA DO EXPEDIENTE' e 'NÃO HAVENDO MAIS EXPEDIENTE A SER LIDO'"
+    },
+    "pronunciamentos": {
+      "marcadores": {
+        "inicio": ["FACULTA A PALAVRA AOS SENHORES VEREADORES", "PALAVRA LIVRE", "PEQUENO EXPEDIENTE"],
+        "fim": ["ORDEM DO DIA", "PASSA-SE À ORDEM DO DIA", "ENCERRADO O PEQUENO EXPEDIENTE"]
+      },
+      "instrucao": "NÃO HAVENDO MAIS EXPEDIENTE A SER LIDO, O SENHOR PRESIDENTE FACULTA A PALAVRA AOS SENHORES VEREADORES PARA FAZER USO DA MESMA SOBRE PRONUNCIAMENTO PÚBLICO OU POLÍTICO POR 15 MINUTOS.",
+      "template": "FEZ USO DA PALAVRA O VEREADOR {nome}, {resumo}",
+      "elementos_obrigatorios": [
+        "Agradecimentos",
+        "Proposições",
+        "Eventos/reuniões",
+        "Críticas/elogios",
+        "Solicitações"
+      ]
+    },
+    "apartes": {
+      "template": "O VEREADOR {nome} PEDE UM APARTE: {resumo}"
+    },
+    "ordem_do_dia": {
+      "marcadores": {
+        "inicio": ["ORDEM DO DIA", "PASSAMOS À ORDEM DO DIA", "INICIA-SE A ORDEM DO DIA"],
+        "fim": ["ENCERRADA A ORDEM DO DIA", "NÃO HAVENDO MAIS NADA A DELIBERAR", "NADA MAIS HAVENDO A TRATAR"]
+      },
+      "instrucao": "O SENHOR PRESIDENTE FACULTA A PALAVRA AOS SENHORES VEREADORES PARA FALAREM SOBRE AS MATÉRIAS EM PAUTA:",
+      "template": "{tipo_materia} Nº {numero}/{ano} - {titulo}"
+    },
+    "votacoes": {
+      "marcadores": {
+        "inicio": ["SUBMETE EM VOTAÇÃO", "COLOCO EM VOTAÇÃO", "PASSAMOS À VOTAÇÃO"],
+        "fim": ["APROVADO POR UNANIMIDADE", "APROVADO POR MAIORIA", "REJEITADO"]
+      },
+      "unanimidade": {
+        "template": "O SENHOR PRESIDENTE SUBMETE EM ÚNICA VOTAÇÃO O {tipo_materia} Nº {numero}/{ano}, APROVADO POR UNANIMIDADE DE VOTOS",
+        "campos_obrigatorios": ["tipo_materia", "numero", "ano"]
+      },
+      "maioria": {
+        "template": "O SENHOR PRESIDENTE SUBMETE EM ÚNICA VOTAÇÃO O {tipo_materia} Nº {numero}/{ano}, APROVADO POR MAIORIA DE VOTOS",
+        "campos_obrigatorios": ["tipo_materia", "numero", "ano"]
+      }
+    }
+  },
+  "encerramento": {
+    "marcadores": {
+      "inicio": ["NADA MAIS HAVENDO A TRATAR", "NÃO HAVENDO MAIS NADA A DELIBERAR", "COMO NÃO HÁ MAIS NADA A DELIBERAR"],
+      "fim": ["ENCERRADA A SESSÃO", "SESSÃO ENCERRADA", "ESTÁ ENCERRADA A SESSÃO"]
+    },
+    "template": "COMO NÃO HÁ MAIS NADA A DELIBERAR, O SENHOR PRESIDENTE LEVANTA A SESSÃO E CONVOCA UMA OUTRA PARA O DIA {dia_proxima_sessao} DE {mes_proxima_sessao} DO CORRENTE ANO NO HORÁRIO REGIMENTAL.",
+    "campos_obrigatorios": ["dia_proxima_sessao", "mes_proxima_sessao"]
+  }
+}
